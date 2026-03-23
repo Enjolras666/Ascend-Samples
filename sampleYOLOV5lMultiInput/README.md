@@ -289,7 +289,7 @@ fseek(fFid, 0, SEEK_SET);
 cd ..
 ```
 
-![image-20260323150513305](data\readme\image-20260323150513305.png)
+![image-20260323150513305](data/readme/image-20260323150513305.png)
 
 - 编译
 
