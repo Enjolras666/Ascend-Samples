@@ -9,7 +9,6 @@
   - [其他资源](#其他资源)
   - [更新说明](#更新说明)
   - [已知issue](#已知issue)
-    
 ## 样例介绍
 功能：使用yolov5l模型对输入数据进行预测推理，推理检测出图片/视频中所有可检测物体，并将推理结果打印到输出上，是一个是基于多路、多线程方案实现的高性能案例，通过多卡并行处理多路数的数据并输出，支持多种输入输出。    
 样例输入：视频mp4文件/视频h26X文件/rtsp视频流。   
@@ -61,6 +60,23 @@
 │   └── main.cpp               //主函数，yolo检测功能的实现文件  
 └── CMakeLists.txt             //编译脚本入口，调用src目录下的CMakeLists文件
 ```
+
+## 硬件环境
+
+| 硬件配置项 | 版本信息       | 备注 |
+| ---------- | -------------- | ---- |
+| 服务器     | Atlas 800 3000 |      |
+| 推理卡     | Atlas 300I Duo | 2张  |
+
+## 软件环境
+
+| 软件配置项 | 版本信息                | 备注                                |
+| ---------- | ----------------------- | ----------------------------------- |
+| 操作系统   | EulerOS 2.0 (SP11)      | 适合多并发处理（或X86的CentOS 7.6） |
+| CPU        | HUAWEI Kunpeng 920 5250 | 96个，2600MHz                       |
+| 驱动       | 25.0.rc1.b050           |                                     |
+| 固件       | 7.7.11.0.b071           |                                     |
+| CANN       | 8.2.RC1                 |                                     |
 
 ## 获取源码包
 
@@ -350,11 +366,11 @@ cp test.264 test1.264
 
 第一个
 
-![image-20260323151236261](data\readme\image-20260323151236261.png)
+![image-20260323151236261](data/readme/image-20260323151236261.png)
 
 第二个
 
-![image-20260323151257056](data\readme\image-20260323151257056.png)
+![image-20260323151257056](data/readme/image-20260323151257056.png)
 
 ## 配置修改
 
@@ -380,7 +396,7 @@ sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.213:554/tes
 
 按照图示修改对应配置
 
-![image-20260323151805703](data\readme\image-20260323151805703.png)
+![image-20260323151805703](data/readme/image-20260323151805703.png)
 
 修改启动脚本
 
@@ -392,7 +408,7 @@ cp sample_run.sh sample_run3.sh
 vim sample_run.sh
 ```
 
-![image-20260323151915512](data\readme\image-20260323151915512.png)
+![image-20260323151915512](data/readme/image-20260323151915512.png)
 
 sample_run1.sh、sample_run2.sh、sample_run3.sh修改为对应的test_devicex.json
 
@@ -412,7 +428,7 @@ bash sample_run.sh
 
 等到出现一连串的帧获取时
 
-![image-20260323152252924](data\readme\image-20260323152252924.png)
+![image-20260323152252924](data/readme/image-20260323152252924.png)
 
 下一个及其他终端再同理启动程序1,2,3
 
@@ -432,19 +448,19 @@ bash sample_run3.sh
 vim sampleYOLOV5lMultiInput/out/device0.log
 ```
 
-![image-20260323152526307](data\readme\image-20260323152526307.png)
+![image-20260323152526307](data/readme/image-20260323152526307.png)
 
 Aicore利用率
 
-![image-20260323152557593](data\readme\image-20260323152557593.png)
+![image-20260323152557593](data/readme/image-20260323152557593.png)
 
 Cpu使用率
 
-![image-20260323152643739](data\readme\image-20260323152643739.png)
+![image-20260323152643739](data/readme/image-20260323152643739.png)
 
 显存使用
 
-![image-20260323152731235](data\readme\image-20260323152731235.png)
+![image-20260323152731235](data/readme/image-20260323152731235.png)
 
 
 
