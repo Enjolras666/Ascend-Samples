@@ -273,7 +273,7 @@ fseek(fFid, 0, SEEK_SET);
 cd ..
 ```
 
-![image-20260323150513305](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323150513305.png)
+![image-20260323150513305](data\readme\image-20260323150513305.png)
 
 - 编译
 
@@ -350,11 +350,11 @@ cp test.264 test1.264
 
 第一个
 
-![image-20260323151236261](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151236261.png)
+![image-20260323151236261](data\readme\image-20260323151236261.png)
 
 第二个
 
-![image-20260323151257056](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151257056.png)
+![image-20260323151257056](data\readme\image-20260323151257056.png)
 
 ## 配置修改
 
@@ -380,7 +380,7 @@ sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.213:554/tes
 
 按照图示修改对应配置
 
-![image-20260323151805703](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151805703.png)
+![image-20260323151805703](data\readme\image-20260323151805703.png)
 
 修改启动脚本
 
@@ -392,7 +392,7 @@ cp sample_run.sh sample_run3.sh
 vim sample_run.sh
 ```
 
-![image-20260323151915512](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151915512.png)
+![image-20260323151915512](data\readme\image-20260323151915512.png)
 
 sample_run1.sh、sample_run2.sh、sample_run3.sh修改为对应的test_devicex.json
 
@@ -412,7 +412,7 @@ bash sample_run.sh
 
 等到出现一连串的帧获取时
 
-![image-20260323152252924](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152252924.png)
+![image-20260323152252924](data\readme\image-20260323152252924.png)
 
 下一个及其他终端再同理启动程序1,2,3
 
@@ -432,19 +432,19 @@ bash sample_run3.sh
 vim sampleYOLOV5lMultiInput/out/device0.log
 ```
 
-![image-20260323152526307](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152526307.png)
+![image-20260323152526307](data\readme\image-20260323152526307.png)
 
 Aicore利用率
 
-![image-20260323152557593](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152557593.png)
+![image-20260323152557593](data\readme\image-20260323152557593.png)
 
 Cpu使用率
 
-![image-20260323152643739](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152643739.png)
+![image-20260323152643739](data\readme\image-20260323152643739.png)
 
 显存使用
 
-![image-20260323152731235](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152731235.png)
+![image-20260323152731235](data\readme\image-20260323152731235.png)
 
 
 
