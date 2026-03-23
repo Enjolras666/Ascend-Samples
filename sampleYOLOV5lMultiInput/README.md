@@ -11,9 +11,9 @@
   - [已知issue](#已知issue)
     
 ## 样例介绍
-功能：使用yolov7模型对输入数据进行预测推理，推理检测出图片/视频中所有可检测物体，并将推理结果打印到输出上，是一个是基于多路、多线程方案实现的高性能案例，通过多卡并行处理多路数的数据并输出，支持多种输入输出。    
-样例输入：原始图片jpg文件/视频mp4文件/视频h26X文件/rtsp视频流。   
-样例输出：带推理结果的图片/带推理结果的视频文件/rtsp视频流展示/cv::imshow窗口展示/打屏显示。 
+功能：使用yolov5l模型对输入数据进行预测推理，推理检测出图片/视频中所有可检测物体，并将推理结果打印到输出上，是一个是基于多路、多线程方案实现的高性能案例，通过多卡并行处理多路数的数据并输出，支持多种输入输出。    
+样例输入：视频mp4文件/视频h26X文件/rtsp视频流。   
+样例输出：打屏显示。 
 
 ## 样例流程图
 通用目标检测与识别一站式方案是一个是基于多路、多线程方案实现的高性能案例，通过多卡并行处理多路数的数据并输出。
@@ -23,7 +23,7 @@
 - 管理线程：将线程和队列打包在一起，并完成进程创建、消息队列创建、消息发送和消息接收守护。
 - 数据输入线程：对输入图片或视频进行解码。
 - 数据预处理线程：对数据输入线程传过来的YUV图片进行处理（resize等操作）。
-- 推理线程：使用YOLOV7模型进行推理。
+- 推理线程：使用YOLOV5l模型进行推理。
 - 数据后处理线程：分析推理结果，输出框点及标签信息。
 - 数据输出线程：将框点及标签信息标识到输出数据上。
 
@@ -63,163 +63,398 @@
 ```
 
 ## 获取源码包
-    
- 可以使用以下两种方式下载，请选择其中一种进行源码准备。
 
- - 命令行方式下载（下载时间较长，但步骤简单）。
+命令行方式下载
 
-   ```    
-   # 开发环境，非root用户命令行中执行以下命令下载源码仓。    
-   cd ${HOME}     
-   git clone https://gitee.com/ascend/samples.git
-   ```
-   **注：如果需要切换到其它tag版本，以v0.5.0为例，可执行以下命令。**
-   ```
-   git checkout v0.5.0
-   ```   
- - 压缩包方式下载（下载时间较短，但步骤稍微复杂）。   
-   **注：如果需要下载其它版本代码，请先请根据前置条件说明进行samples仓分支切换。**   
-   ``` 
-   # 1. samples仓右上角选择 【克隆/下载】 下拉框并选择 【下载ZIP】。    
-   # 2. 将ZIP包上传到开发环境中的普通用户家目录中，【例如：${HOME}/ascend-samples-master.zip】。     
-   # 3. 开发环境中，执行以下命令，解压zip包。     
-   cd ${HOME}    
-   unzip ascend-samples-master.zip
-   ```
+```    
+# 开发环境，非root用户命令行中执行以下命令下载源码仓。    
+cd ${HOME}     
+git clone https://github.com/Enjolras666/Ascend-Samples.git 
+```
+## 设置环境变量
+
+```
+# 全部操作在宿主机执行
+export DDK_PATH=/usr/local/Ascend/ascend-toolkit/latest
+export NPU_HOST_LIB=$DDK_PATH/runtime/lib64/stub
+export THIRDPART_PATH=${DDK_PATH}/thirdpart
+export LD_LIBRARY_PATH=${THIRDPART_PATH}/lib:$LD_LIBRARY_PATH
+
+mkdir -p ${THIRDPART_PATH}
+```
 
 ## 第三方依赖安装
- 设置环境变量，配置程序编译依赖的头文件，库文件路径。
 
-   ```
-    export DDK_PATH=$HOME/Ascend/ascend-toolkit/latest
-    export NPU_HOST_LIB=$DDK_PATH/runtime/lib64/stub
-    export THIRDPART_PATH=${DDK_PATH}/thirdpart
-    export LD_LIBRARY_PATH=${THIRDPART_PATH}/lib:$LD_LIBRARY_PATH
-   ```
-  创建THIRDPART_PATH路径
+- git、gcc、cmake
 
-   ```
-    mkdir -p ${THIRDPART_PATH}
-   ```
+  执行以下命令安装
+
+  ```
+  vim /etc/yum.conf
+  (最后一行添加sslverify=False，保存退出)
+  yum install -y git
+  yum install -y gcc-g++ cmake
+  git config --global http.sslVerify False
+  cd ${HOME}
+  ```
+
 - x264
 
     执行以下命令安装x264
    ```
-   cd ${HOME}
    git clone https://code.videolan.org/videolan/x264.git
    cd x264
-   # 安装x264
    ./configure --enable-shared --disable-asm
    make
-   sudo make install
-   sudo cp /usr/local/lib/libx264.so.164 /lib
-   ```   
-
+   make install
+   ls /usr/local/lib/libx264.so.165
+   cp /usr/local/lib/libx264.so.165 /lib
+   ```
+   
 - ffmpeg
 
   执行以下命令安装ffmpeg
    ```
-   cd ${HOME}
-   wget http://www.ffmpeg.org/releases/ffmpeg-4.1.3.tar.gz --no-check-certificate
-   tar -zxvf ffmpeg-4.1.3.tar.gz
-   cd ffmpeg-4.1.3
-   # 安装ffmpeg
-   ./configure --enable-shared --enable-pic --enable-static --disable-x86asm --enable-libx264 --enable-gpl --prefix=${THIRDPART_PATH}
-   make -j8
-   make install
-   ```   
-   
+  cd $HOME
+  wget http://www.ffmpeg.org/releases/ffmpeg-4.1.3.tar.gz --no-check-certificate
+  tar -zxvf ffmpeg-4.1.3.tar.gz
+  cd ffmpeg-4.1.3
+  ./configure --enable-shared --enable-pic --enable-static --disable-x86asm --enable-libx264 --enable-gpl --prefix=${THIRDPART_PATH}
+  make -j8
+  make install
+   ```
+  
    </details> 
-
+  
 - opencv
 
-  执行以下命令安装opencv(注:确保是3.x版本)
-  ```
-  sudo apt-get install libopencv-dev
-  ```   
+  命令行yum安装opencv:
 
+  ```
+  yum install -y opencv
+  ln -s /usr/include/opencv4/opencv2 /usr/include/opencv2
+  ```
+
+- X11
+
+  命令行yum安装X11:
+
+  ```
+  yum install -y libX11-devel
+  ```
+  
 - jsoncpp
 
-  命令行apt安装jsoncpp：
+  命令行yum安装jsoncpp：
 
    ```
-   # 安装完成后静态库在系统：/usr/include；动态库在：/usr/lib/x84_64-linux-gnu
-   sudo apt-get install libjsoncpp-dev 
-   sudo ln -s /usr/include/jsoncpp/json/ /usr/include/json
+  yum install -y jsoncpp-devel
    ```
 
-## 样例运行
-   > 注：这里以一路MP4视频为输入，输出保存为离线mp4视频为例演示验证样例运行，关于样例运行所使用的更多相关参数配置说明请参考[样例参数配置说明](./configDemo.md)。
+## 模型准备
 
-  - 数据准备
+```
+cd sampleYOLOV5lMultiInput/model/
+```
 
-    请从以下链接获取该样例的输入视频，放在data目录下。
-        
-    ```    
-    cd $HOME/samples/inference/modelInference/sampleYOLOV7MultiInput/data
-    wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/YOLOV3_carColor_sample/data/car0.mp4 --no-check-certificate
-    ```
+- InceptionV3
 
-  - ATC模型转换
+```
+# onnx
+wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/InceptionV3/inceptionv3.onnx
 
-    将yolov7原始模型转换为适配昇腾310处理器的离线模型（\*.om文件），放在model路径下。
-   
-    ```
-    # 为了方便下载，在这里直接给出原始模型下载及模型转换命令,可以直接拷贝执行。
-    cd $HOME/samples/inference/modelInference/sampleYOLOV7MultiInput/model
-    # 下载yolov7的原始模型文件及AIPP配置文件
-    wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/yolov7/yolov7x.onnx --no-check-certificate
-    wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/yolov7/aipp.cfg --no-check-certificate
-    # 请使用与芯片名相对应的<soc_version>取值进行模型转换，然后再进行推理
-    atc --model=yolov7x.onnx --framework=5 --output=yolov7x --input_shape="images:1,3,640,640"  --soc_version=Ascend310  --insert_op_conf=aipp.cfg
-    ```
+# aipp
+wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/InceptionV3/aipp_inceptionv3_pth.config
 
-  - 样例编译
+# atc转换
+atc --model=./inceptionv3.onnx --framework=5 --output=InceptionV3_bs8 --soc_version=Ascend310P3 --insert_op_conf=./aipp_inceptionv3_pth.config --input_shape="actual_input_1:8,3,300,300" --input_format=NCHW --precision_mode=allow_fp32_to_fp16 --enable_small_channel=1 --op_select_implmode=high_performance
+```
 
-    执行以下命令，执行编译脚本，开始样例编译。
-    ```
-    cd $HOME/samples/inference/modelInference/sampleYOLOV7MultiInput/scripts
-    bash sample_build.sh
-    ```
+- Yolov5l
 
-  - 样例运行
+```
+# yolo代码
+git clone https://github.com/ultralytics/yolov5.git
+cd yolov5
+pip3 install -r requirements.txt
+pip3 install onnx==1.14.1 protobuf==3.20.3
 
-    执行运行脚本，开始样例运行。
-    ```
-    bash sample_run.sh
-    ```
+# 下载权重
+wget https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5l.pt --no-check-certificate
 
-  - 样例结果展示
-    
-    会根据scripts/test.json文件配置的结果输出方式输出应用的推理结果，包含物体的检测框信息。
-    输出数据类型配置为video，输出数据存储在out文件夹下，为名称类似于：**XXXX.mp4** 的视频。
+# 导出onnx文件
+python3 export.py --weights yolov5l.pt --include onnx --opset 12
 
-    执行成功后，样例将根据配置的输出数据类型，输出不同文件，结果框坐标信息等可能会根据版本、环境有所不同，请以实际情况为准。
+# aipp
+vim aipp.cfg
+​```
+aipp_op {
+    aipp_mode: static
+    input_format: YUV420SP_U8
+    csc_switch: true
+    # 如果输入的是YVU420SP_U8（NV21）图像，则需要将rbuv_swap_switch参数设置为true
+    rbuv_swap_switch: false
+    related_input_rank: 0
+    src_image_size_w: 640
+    src_image_size_h: 640
+    crop: false
+    matrix_r0c0: 256
+    matrix_r0c1: 0
+    matrix_r0c2: 359
+    matrix_r1c0: 256
+    matrix_r1c1: -88
+    matrix_r1c2: -183
+    matrix_r2c0: 256
+    matrix_r2c1: 454
+    matrix_r2c2: 0
+    input_bias_0: 0
+    input_bias_1: 128
+    input_bias_2: 128
+    # 归一化系数需要根据用户模型实际需求配置，如下所列常见值仅作为示例
+    # 归一化系数应用于色域转换和通道交换之后的通道
+    mean_chn_0: 0
+    mean_chn_1: 0
+    mean_chn_2: 0
+    min_chn_0: 0.0
+    min_chn_1: 0.0
+    min_chn_2: 0.0
+    var_reci_chn_0: 0.003921568859368563
+    var_reci_chn_1: 0.003921568859368563
+    var_reci_chn_2: 0.003921568859368563
+    var_reci_chn_3: 1
+}
+​```
 
-    - 若输出数据类型配置为pic
-      输出数据存储在out/文件夹下，为名称类似于**channel_X_out_pic_Y.jpg** 的图片，其中X代表第x路，Y代表第y张图片。
+# op
+vim fusion.cfg
+​```
+TbeConvDequantSigmoidMulAddFusionPass:on
+​```
 
-    - 若输出数据类型配置为video
-      输出数据存储在out/output文件夹下，为名称类似于：**XXXX.mp4** 的视频，其中X代表第x路。
+# atc转换
+atc --model=yolov5l.onnx --framework=5 --output=yolov5l --input_shape="images:1,3,640,640"  --soc_version=Ascend310P3  --insert_op_conf=aipp.cfg --fusion_switch_file=fusion.cfg --enable_small_channel=1 --optypelist_for_implmode="Sigmoid" --op_select_implmode=high_performance
+```
 
-## 其他资源
+## 程序编译
 
-以下资源提供了对通用目标识别样例的更多了解，包括如何进行定制开发和性能提升：
+```
+cd ../scripts
+# 编译
+bash sample_build.sh
 
-**Documentation**
-- [通用目标识别样例](https://gitee.com/ascend/samples/wikis/%E9%80%9A%E7%94%A8%E7%9B%AE%E6%A0%87%E8%AF%86%E5%88%AB%E6%A0%B7%E4%BE%8B/%E5%89%8D%E8%A8%80/%E6%A6%82%E8%BF%B0)
-- [AscendCL Samples介绍](../README_CN.md)
-- [使用AscendCLC API库开发深度神经网络应用](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/600alpha006/infacldevg/aclcppdevg/aclcppdevg_000000.html)
-- [昇腾文档](https://www.hiascend.com/document?tag=community-developer)
+# 测试,正常退出即程序可用。
+bash sample_run.sh
+```
+
+## Live555推流
+
+- 下载
+
+```
+wget https://download.live555.com/live555-latest.tar.gz --no-check-certificate
+
+tar -zxvf live555-latest.tar.gz
+
+cd live/liveMedia
+```
+
+- 改视频循环
+
+```
+chmod +w ByteStreamFileSource.cpp
+
+vim ByteStreamFileSource.cpp +95
+
+# 改ByteStreamFileSource::doGetNextFrame()函数
+​```
+fseek(fFid, 0, SEEK_SET);
+​```
+
+cd ..
+```
+
+![image-20260323150513305](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323150513305.png)
+
+- 编译
+
+```
+./genMakefiles linux
+make
+# 启动服务
+cd mediaServer/
+./live555MediaServer
+```
+
+- 设置264文件
+
+另起个终端
+
+```
+cd ~
+```
+
+安装ffmpeg-plugin
+
+```
+wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.4.4.zip --no-check-certificate -O FFmpeg-n4.4.4.zip
+unzip FFmpeg-n4.4.4.zip
+cd FFmpeg-n4.4.4
+
+# patch
+wget https://raw.gitcode.com/Ascend/mindsdk-referenceapps/blobs/a4a6809c55f12cf650113d2ab47ade31592bd707/ascend_ffmpeg.patch
+yum install -y patch
+patch -p1 -f < ascend_ffmpeg.patch
+
+# 重新编译
+export ASCEND_HOME=/usr/local/Ascend
+. /usr/local/Ascend/ascend-toolkit/set_env.sh
+
+./configure \
+    --prefix=./ascend \
+    --enable-shared \
+    --extra-cflags="-I${ASCEND_HOME}/ascend-toolkit/latest/acllib/include" \
+    --extra-ldflags="-L${ASCEND_HOME}/ascend-toolkit/latest/acllib/lib64" \
+    --extra-libs="-lacl_dvpp_mpi -lascendcl" \
+    --enable-ascend \
+    && make -j && make install
+
+# 添加FFmpeg环境变量
+示例: /root为FFmpeg-n4.4.4所在目录
+export FFMPEG_LIB_PATH=/root/FFmpeg-n4.4.4/ascend/lib
+export LD_LIBRARY_PATH=${FFMPEG_LIB_PATH}:$LD_LIBRARY_PATH
+```
+
+mp4转264
+
+```
+wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/yolov5s/test.mp4 --no-check-certificate
+
+./ffmpeg -hwaccel ascend -c:v h264_ascend -i test.mp4 -s:v 1920x1080 -rc_mode 1 -r 25 -g 250 -b:v 8m -c:v h264_ascend test.264
+
+将转换好的test.264，放到推理的live555服务路径文件夹下，即可完成推流。
+mv ./test.264 /home/kz/live/mediaServer/
+```
+
+复制一个转换好的test.264，给其他device使用
+
+```
+cd /home/kz/live/mediaServer/
+cp test.264 test1.264
+```
+
+在另一台服务器再起一个live555服务
+
+按照上面复制test.264把test2.264，test3.264设置推流给device2，device3使用。
+
+（测试发现live555无法同时承载240+路数，代码打开rtsp会报错，所以配置两个）
+
+第一个
+
+![image-20260323151236261](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151236261.png)
+
+第二个
+
+![image-20260323151257056](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151257056.png)
+
+## 配置修改
+
+另起一个终端
+
+```
+cd sampleYOLOV5lMultiInput/scripts
+
+vim test_device0.json
+```
+
+批量修改地址可使用
+
+```
+sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.215:554/test.264@g" test_device0.json
+
+sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.215:554/test1.264@g" test_device1.json
+
+sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.213:554/test2.264@g" test_device2.json
+
+sed -i "s@rtsp://192.168.1.214:8554/h264ESVideoTest@rtsp://141.61.21.213:554/test3.264@g" test_device3.json
+```
+
+按照图示修改对应配置
+
+![image-20260323151805703](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151805703.png)
+
+修改启动脚本
+
+```
+cp sample_run.sh sample_run1.sh
+cp sample_run.sh sample_run2.sh
+cp sample_run.sh sample_run3.sh
+
+vim sample_run.sh
+```
+
+![image-20260323151915512](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323151915512.png)
+
+sample_run1.sh、sample_run2.sh、sample_run3.sh修改为对应的test_devicex.json
+
+## 测试启动
+
+再启动3个终端，进入启动脚本路径
+
+```
+cd sampleYOLOV5lMultiInput/scripts
+```
+
+依次运行
+
+```
+bash sample_run.sh
+```
+
+等到出现一连串的帧获取时
+
+![image-20260323152252924](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152252924.png)
+
+下一个及其他终端再同理启动程序1,2,3
+
+```
+bash sample_run1.sh 
+bash sample_run2.sh 
+bash sample_run3.sh 
+```
+
+## 测试结果
+
+两张300I duo卡（4个device），各打开80 channel的视频流，总共320路视频流。
+
+查看日志及截图如下：
+
+```
+vim sampleYOLOV5lMultiInput/out/device0.log
+```
+
+![image-20260323152526307](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152526307.png)
+
+Aicore利用率
+
+![image-20260323152557593](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152557593.png)
+
+Cpu使用率
+
+![image-20260323152643739](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152643739.png)
+
+显存使用
+
+![image-20260323152731235](C:\Users\jkz\AppData\Roaming\Typora\typora-user-images\image-20260323152731235.png)
+
+
 
 ## 更新说明
-  | 时间 | 更新事项 |
+
+| 时间 | 更新事项 |
 |----|------|
-| 2023/05/16| 案例新增功能点：模型多batch、单路输入支持1-4路后处理，imshow输出展示 |
-| 2023/05/16| 修改sampleYOLOV7MultiInput/README.md，新增样例配置文件说明configDemo.md |
-| 2023/03/28| 新增sampleYOLOV7MultiInput/README.md |
-  
+| 2026/03/23 | 新增sampleYOLOV5lMultiInput/README.md |
+
 
 ## 已知issue
 
-  暂无
+1.   正常使用时，plog也会打印ERROR的日志信息（Free host memory failed，get index by name failed, cannot find tensor name[ascend_mbatch_shape_data]），会影响报错定位，暂无解决方法；

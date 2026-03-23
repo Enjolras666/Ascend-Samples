@@ -268,6 +268,6 @@ int main(int argc, char *argv[])
     if (ret != ACLLITE_OK) {
         ACLLITE_LOG_ERROR("Init app failed");
     }
-    StartApp(aclDev);
+    StartApp(aclDev, inputDataPath);
     return ACLLITE_OK;
 }

@@ -51,7 +51,7 @@ endif()
 link_directories(
         /usr/lib/aarch64-linux-gnu/
         ${INC_PATH}/runtime/lib64/stub
-        #${INC_PATH}/thirdpart/lib
+        ${INC_PATH}/thirdpart/lib
 )
 
 add_executable(main

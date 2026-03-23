@@ -92,6 +92,9 @@ AclLiteError ClassifyPostprocessThread::InferOutputProcess(shared_ptr<DetectData
     if (detectDataMsg->batchData[0].hasDetected == false) {
         return ACLLITE_OK;
     }
+    if (detectDataMsg->classifyInferenceOutput.empty()) {
+        return ACLLITE_OK;
+    }
 
     void* outHostData = CopyDataToHost(detectDataMsg->classifyInferenceOutput[0].data.get(),
         detectDataMsg->classifyInferenceOutput[0].size, runMode_, MEMORY_NORMAL);
